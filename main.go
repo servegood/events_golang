@@ -1,14 +1,15 @@
 package main
 
 import (
+	"events_golang/helper"
 	"fmt"
-	"strings"
+	"strconv"
 )
 
 var eventName = "GoLang Conference"
 var eventTickets uint= 50
 var remainingTickets uint = 50
-var bookings = []string{}
+var bookings = make([]map[string]string, 0) //initialize a list/array of map/hash
 
 func main(){
 
@@ -17,7 +18,7 @@ func main(){
 	for {
 
 		firstName, lastName, email, userTickets := getUserInput()
-		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, email, userTickets)
+		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
 		//Book ticket in system only if the userinputs are validated
 		if(isValidName && isValidEmail && isValidTicketNumber) {
@@ -69,8 +70,7 @@ func greetUser(){
 func getFirstNames() [] string{
 	firstNames :=[]string{}
 	for _, booking := range bookings{
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking["firstName"]) //direct access to firstName due to object based storing of booking
 	}
 	return firstNames
 }
@@ -94,9 +94,18 @@ func getUserInput() (string, string, string, uint){
 }
 
 func bookTicket(firstName string, lastName string, email string, userTickets uint){
-	bookings = append(bookings, firstName + " " + lastName)
+	
 	remainingTickets = remainingTickets - userTickets
 
+	//create a map for a suer
+	var userData = make(map[string]string)
+	userData["firstName"] = firstName
+	userData["lastName"] = lastName
+	userData["email"] = email
+	userData["numberOfTickets"] = strconv.FormatUint(uint64(userTickets), 10)
+
+	bookings = append(bookings, userData) //now added the whole map object (previously it was just strings of firstName + lastName)
+	fmt.Printf("List of bookings is %v\n", bookings)
 	fmt.Printf("Thank you for %v %v for booking %v tickets. Check your email at %v for confirmation\n", firstName, lastName, userTickets, email)
 	fmt.Printf("%v tickets remaining for %v\n\n", remainingTickets, eventName)
 			
