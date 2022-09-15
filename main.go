@@ -14,32 +14,16 @@ func main(){
 	greetUser(eventName, eventTickets, remainingTickets)
 	
 	for {
-		var firstName string
-		var lastName string
-		var email string
-		var userTickets uint
 
-		//User Inputs - Name, email, tickets
-		fmt.Println("Enter your First Name")
-		fmt.Scan(&firstName)
-		fmt.Println("Enter your Last Name")
-		fmt.Scan(&lastName)
-		fmt.Println("Email")
-		fmt.Scan(&email)
-		fmt.Println("How many tickets?")
-		fmt.Scan(&userTickets)
-
+		firstName, lastName, email, userTickets := getUserInput()
 		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
 		//Book ticket in system only if the userinputs are validated
 		if(isValidName && isValidEmail && isValidTicketNumber) {
-			//Bookings, RemainingTickets
-			bookings = append(bookings, firstName + " " + lastName)
-			remainingTickets = remainingTickets - userTickets
-
-			fmt.Printf("Thank you for %v %v for booking %v tickets. Check your email at %v for confirmation\n", firstName, lastName, userTickets, email)
-			fmt.Printf("%v tickets remaining for %v\n\n", remainingTickets, eventName)
 			
+			//Bookings, RemainingTickets
+			bookTicket(bookings, firstName, lastName, email, remainingTickets, userTickets, eventName)
+
 			firstNames := getFirstNames(bookings)
 			fmt.Printf("The firstname of bookings are: %v\n", firstNames)
 
@@ -98,5 +82,31 @@ func validateUserInput(firstName string, lastName string, email string, userTick
 	return isValidName, isValidEmail, isValidTicketNumber
 }
 
-	// fmt.Printf("Slice type: %T\n", bookings)
-	// fmt.Printf("Slice length: %T\n", len(bookings))
+func getUserInput() (string, string, string, uint){
+	var firstName string
+	var lastName string
+	var email string
+	var userTickets uint
+
+	//User Inputs - Name, email, tickets
+	fmt.Println("Enter your First Name")
+	fmt.Scan(&firstName)
+	fmt.Println("Enter your Last Name")
+	fmt.Scan(&lastName)
+	fmt.Println("Email")
+	fmt.Scan(&email)
+	fmt.Println("How many tickets?")
+	fmt.Scan(&userTickets)
+	return firstName, lastName, email, userTickets
+}
+
+func bookTicket(bookings []string, firstName string, lastName string, email string, remainingTickets uint, userTickets uint, eventName string){
+	bookings = append(bookings, firstName + " " + lastName)
+	remainingTickets = remainingTickets - userTickets
+
+	fmt.Printf("Thank you for %v %v for booking %v tickets. Check your email at %v for confirmation\n", firstName, lastName, userTickets, email)
+	fmt.Printf("%v tickets remaining for %v\n\n", remainingTickets, eventName)
+			
+}
+// fmt.Printf("Slice type: %T\n", bookings)
+// fmt.Printf("Slice length: %T\n", len(bookings))
