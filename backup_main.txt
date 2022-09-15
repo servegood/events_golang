@@ -1,23 +1,17 @@
-package main
+package backup_main
 
 import (
 	"events_golang/helper"
 	"fmt"
+	"strconv"
 )
-
-type UserData struct{
-	firstName string
-	lastName string
-	email string
-	numberOfTickets uint
-}
 
 var eventName = "GoLang Conference"
 var eventTickets uint= 50
 var remainingTickets uint = 50
-var bookings = make([]UserData, 0) //initialize a list/array of map/hash
+var bookings = make([]map[string]string, 0) //initialize a list/array of map/hash
 
-func main(){
+func backup_main(){
 
 	greetUser()
 	
@@ -76,12 +70,7 @@ func greetUser(){
 func getFirstNames() [] string{
 	firstNames :=[]string{}
 	for _, booking := range bookings{
-		
-		//using map
-		//firstNames = append(firstNames, booking["firstName"]) //direct access to firstName due to object based storing of booking
-		
-		//using struct
-		firstNames = append(firstNames, booking.firstName) //direct access to struct firstName
+		firstNames = append(firstNames, booking["firstName"]) //direct access to firstName due to object based storing of booking
 	}
 	return firstNames
 }
@@ -109,12 +98,11 @@ func bookTicket(firstName string, lastName string, email string, userTickets uin
 	remainingTickets = remainingTickets - userTickets
 
 	//create a map for a suer
-	var userData = UserData{
-		firstName: firstName,
-		lastName: lastName,
-		email: email,
-		numberOfTickets: userTickets,
-	}
+	var userData = make(map[string]string)
+	userData["firstName"] = firstName
+	userData["lastName"] = lastName
+	userData["email"] = email
+	userData["numberOfTickets"] = strconv.FormatUint(uint64(userTickets), 10)
 
 	bookings = append(bookings, userData) //now added the whole map object (previously it was just strings of firstName + lastName)
 	fmt.Printf("List of bookings is %v\n", bookings)
