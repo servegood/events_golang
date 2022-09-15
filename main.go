@@ -6,13 +6,12 @@ import (
 )
 
 func main(){
-	eventsName := "GoLang Developer Bootcamp"
-	fmt.Printf("Welcome to %v Events-Booking Command-Line Application\n", eventsName)
+	eventName:= "GoLang Conference"
 	var eventTickets uint= 50
 	var remainingTickets uint = 50
 	bookings :=[]string{}
 
-	fmt.Printf("We have total of %v tickets and %v are still remaining\n", eventTickets, remainingTickets)
+	greetUser(eventName, eventTickets, remainingTickets)
 	
 	for {
 		var firstName string
@@ -30,10 +29,7 @@ func main(){
 		fmt.Println("How many tickets?")
 		fmt.Scan(&userTickets)
 
-		//validate user input
-		isValidName := len(firstName) >=3 && len(lastName) >=3 
-		isValidEmail := strings.Contains(email, "@")
-		isValidTicketNumber := userTickets > 0 && userTickets <= remainingTickets
+		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
 		//Book ticket in system only if the userinputs are validated
 		if(isValidName && isValidEmail && isValidTicketNumber) {
@@ -42,13 +38,9 @@ func main(){
 			remainingTickets = remainingTickets - userTickets
 
 			fmt.Printf("Thank you for %v %v for booking %v tickets. Check your email at %v for confirmation\n", firstName, lastName, userTickets, email)
-			fmt.Printf("%v tickets remaining for %v\n\n", remainingTickets, eventsName)
-
-			firstNames :=[]string{}
-			for _, booking := range bookings{
-				var names = strings.Fields(booking)
-				firstNames = append(firstNames, names[0])
-			}
+			fmt.Printf("%v tickets remaining for %v\n\n", remainingTickets, eventName)
+			
+			firstNames := getFirstNames(bookings)
 			fmt.Printf("The firstname of bookings are: %v\n", firstNames)
 
 			//exit the application if no tickets are left
@@ -82,6 +74,28 @@ func main(){
 		default:
 			fmt.Println("No valid city selected")
 	}
+}
+
+func greetUser(eventName string, eventTickets uint, remainingTickets uint){
+	fmt.Printf("Welcome to %v Events-Booking Command-Line Application\n", eventName)
+	fmt.Printf("We have total of %v tickets and %v are still remaining\n", eventTickets, remainingTickets)
+}
+
+func getFirstNames(bookings []string) [] string{
+	firstNames :=[]string{}
+	for _, booking := range bookings{
+		var names = strings.Fields(booking)
+		firstNames = append(firstNames, names[0])
+	}
+	return firstNames
+}
+
+func validateUserInput(firstName string, lastName string, email string, userTickets uint, remainingTickets uint) (bool, bool, bool){
+	//validate user input
+	isValidName := len(firstName) >=3 && len(lastName) >=3 
+	isValidEmail := strings.Contains(email, "@")
+	isValidTicketNumber := userTickets > 0 && userTickets <= remainingTickets
+	return isValidName, isValidEmail, isValidTicketNumber
 }
 
 	// fmt.Printf("Slice type: %T\n", bookings)
