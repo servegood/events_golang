@@ -3,7 +3,7 @@ package main
 import (
 	"events_golang/helper"
 	"fmt"
-	"sync"
+	"time"
 )
 
 type UserData struct{
@@ -12,8 +12,6 @@ type UserData struct{
 	email string
 	numberOfTickets uint
 }
-
-var wg = sync.WaitGroup{}
 
 var eventName = "GoLang Conference"
 var eventTickets uint= 50
@@ -24,37 +22,39 @@ func main(){
 
 	greetUser()
 	
-	firstName, lastName, email, userTickets := getUserInput()
-	isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+	for {
 
-	//Book ticket in system only if the userinputs are validated
-	if(isValidName && isValidEmail && isValidTicketNumber) {		
-		//Bookings, RemainingTickets
-		bookTicket(firstName, lastName, email, userTickets)
+		firstName, lastName, email, userTickets := getUserInput()
+		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+
+		//Book ticket in system only if the userinputs are validated
+		if(isValidName && isValidEmail && isValidTicketNumber) {
 			
-		wg.Add(1) //just before the new thread
-	
-		//send confirmation by email - spawn on another thread - by just adding go in the front
-		go sendTicket(userTickets, firstName, lastName, email) //just added "go" in front to make it concurrent and golang handles it
-		firstNames := getFirstNames()
-		fmt.Printf("The firstname of bookings are: %v\n", firstNames)
+			//Bookings, RemainingTickets
+			bookTicket(firstName, lastName, email, userTickets)
 
-		//exit the application if no tickets are left
-		if remainingTickets == 0 {
-			fmt.Println("Our event is fully booked out! Sorry try next time")
-			//break  //main for loop was removed to demo concurrency go routine with sync.WaitGroup
+			//send confirmation by email - spawn on another thread - by just adding go in the front
+			go sendTicket(userTickets, firstName, lastName, email) //just added "go" in front to make it concurrent and golang handles it
+			firstNames := getFirstNames()
+			fmt.Printf("The firstname of bookings are: %v\n", firstNames)
+
+			//exit the application if no tickets are left
+			if remainingTickets == 0 {
+				fmt.Println("Our event is fully booked out! Sorry try next time")
+				break
+			}
+		} else {
+			if !isValidName {
+				fmt.Println("FirstName or LastName entered is too short")
+			}
+			if !isValidEmail {
+				fmt.Println("Email address is invalid")
+			}
+			if !isValidTicketNumber {
+				fmt.Println("Number of tickets is invalid")
+			}
+			continue
 		}
-	} else {
-		if !isValidName {
-			fmt.Println("FirstName or LastName entered is too short")
-		}
-		if !isValidEmail {
-			fmt.Println("Email address is invalid")
-		}
-		if !isValidTicketNumber {
-			fmt.Println("Number of tickets is invalid")
-		}
-		//continue //main for loop was removed to demo concurrency go routine with sync.WaitGroup
 	}
 
 	//switch statement example
@@ -69,7 +69,6 @@ func main(){
 		default:
 			fmt.Println("No valid city selected")
 	}
-	wg.Wait() //Blocks until the WaitGroup counter is 0 - so that all concurrent threads are cleared up before exiting
 }
 
 func greetUser(){
@@ -129,12 +128,11 @@ func bookTicket(firstName string, lastName string, email string, userTickets uin
 }
 
 func sendTicket(userTickets uint, firstName string, lastName string, email string){
-	// time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	var ticket = fmt.Sprintf("%v tickets for %v %v", userTickets, firstName, lastName)
 	fmt.Println("##########")
 	fmt.Printf("Sending ticket:\n %v \nto email address %v\n", ticket, email)
 	fmt.Println("##########")
-	wg.Done()
 }
 // fmt.Printf("Slice type: %T\n", bookings)
 // fmt.Printf("Slice length: %T\n", len(bookings))
